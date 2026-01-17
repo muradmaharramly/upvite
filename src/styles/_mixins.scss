@@ -1,0 +1,12 @@
+@mixin focus-ring {
+  outline: 2px solid var(--color-primary-soft);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px var(--color-primary-soft);
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
