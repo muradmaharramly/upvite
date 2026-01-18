@@ -7,6 +7,7 @@ import { LiaTimesSolid } from 'react-icons/lia'
 import { signOut } from '../../features/auth/authSlice'
 import { toggleTheme, toggleSidebar, closeSidebar } from '../../features/ui/uiSlice'
 import { IoMdLogIn, IoMdLogOut } from 'react-icons/io'
+import AppLogo from '../../assets/images/upvite-logo.png'
 
 function AppShell() {
   const dispatch = useDispatch()
@@ -37,7 +38,7 @@ function AppShell() {
               <div className="sidebar-header-row">
                 <button type="button" className="app-logo">
                   <Link to="/">
-                    <span className="app-logo-mark">UP</span>
+                    <div className='logo-img'><img src={AppLogo}></img></div>
                     <span className="app-logo-text">Upvite</span>
                   </Link>
                 </button>

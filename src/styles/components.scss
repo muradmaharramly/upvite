@@ -479,6 +479,79 @@
   gap: 1.5rem;
 }
 
+.builder-grid > .card {
+  position: relative;
+  overflow: hidden;
+}
+
+.builder-grid > .card::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  right: auto;
+  border-radius: 999px;
+  background: radial-gradient(circle at top left, rgba(129, 140, 248, 0.25), transparent 60%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.builder-grid > .card::after {
+  content: '';
+  position: absolute;
+  top: 0.9rem;
+  right: 1.1rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-primary));
+  opacity: 0.2;
+}
+
+.builder-grid > .card:nth-child(1)::after {
+  opacity: 0.32;
+}
+
+.builder-grid > .card:nth-child(2)::after {
+  opacity: 0.45;
+}
+
+.builder-grid > .card .card-footer {
+  justify-content: space-between;
+}
+
+.builder-grid > .card:nth-child(1) .card-footer::before,
+.builder-grid > .card:nth-child(2) .card-footer::before {
+  content: attr(data-helper);
+}
+
+.builder-grid > .card:nth-child(1) .card-footer::before {
+  content: 'Best for 1–5 guests or quick tests';
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.builder-grid > .card:nth-child(2) .card-footer::before {
+  content: 'Best for large lists / recurring events';
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.builder-grid > .card:nth-child(1) .card-body p::after {
+  content: ' Track a single invitation end-to-end before scaling to bulk mode.';
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.builder-grid > .card:nth-child(2) .card-body p::after {
+  content: ' Ideal for importing spreadsheets from CRM tools or guest lists.';
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
 @media (max-width: 900px) {
   .page-header {
     flex-direction: column;
@@ -1092,11 +1165,21 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 2rem var(--layout-gutter);
+  padding: 2.5rem var(--layout-gutter);
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.18), transparent 55%),
+    var(--color-bg);
+}
+
+.invite-public-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  align-items: stretch;
+  max-width: 720px;
+  width: 100%;
 }
 
 .invite-card {
-  max-width: 640px;
   width: 100%;
   border-radius: 1.75rem;
   padding: 2.25rem 2.5rem;
@@ -1141,4 +1224,34 @@
   margin: 0;
   font-size: 0.9rem;
   opacity: 0.9;
+}
+
+.invite-public-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.invite-public-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.invite-public-meta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .invite-card {
+    padding: 1.75rem 1.6rem;
+    border-radius: 1.4rem;
+  }
+
+  .invite-name {
+    font-size: 1.65rem;
+  }
 }

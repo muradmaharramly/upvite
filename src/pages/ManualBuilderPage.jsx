@@ -33,7 +33,14 @@ function ManualBuilderPage() {
       return
     }
     const origin = window.location.origin
-    const url = `${origin}/invite/${templateSlug}/${slug}`
+    const params = new URLSearchParams()
+    if (manual.text) params.set('text', manual.text)
+    if (manual.eventDate) params.set('date', manual.eventDate)
+    if (manual.eventLocation) params.set('location', manual.eventLocation)
+    const query = params.toString()
+    const url = query
+      ? `${origin}/invite/${templateSlug}/${slug}?${query}`
+      : `${origin}/invite/${templateSlug}/${slug}`
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url)
       toast.success('Share link copied')

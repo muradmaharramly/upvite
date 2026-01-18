@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation, Link } from 'react-router-dom'
 
 function formatNameFromSlug(slug) {
   if (!slug) return ''
@@ -13,24 +13,45 @@ function formatNameFromSlug(slug) {
 function InvitePublicPage() {
   const { templateSlug, slug } = useParams()
   const fullName = formatNameFromSlug(slug)
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const customText = searchParams.get('text') || ''
+  const eventDate = searchParams.get('date') || ''
+  const eventLocation = searchParams.get('location') || ''
+  const hasDetails = Boolean(customText || eventDate || eventLocation)
 
   return (
     <div className="invite-public-page">
-      <section className={`invite-card invite-card-${templateSlug}`}>
-        <p className="invite-label">Invitation</p>
-        <h1 className="invite-name">{fullName || 'Your guest'}</h1>
-        <p className="invite-text">
-          You are invited to this event. The host used Upvite to generate personalized
-          invitations for every guest.
-        </p>
-        <p className="invite-meta">
-          Event details are not available in this preview. Sign in to Upvite to see the
-          full invitation configuration.
-        </p>
-      </section>
+      <div className="invite-public-inner">
+        <section className={`invite-card invite-card-${templateSlug}`}>
+          <p className="invite-label">Invitation</p>
+          <h1 className="invite-name">{fullName || 'Your guest'}</h1>
+          <p className="invite-text">
+            {customText ||
+              'You are invited to this event. The host used Upvite to generate personalized invitations for every guest.'}
+          </p>
+          <p className="invite-meta">
+            {hasDetails
+              ? `${eventDate || 'Event date'} • ${eventLocation || 'Location'}`
+              : 'Event details are not available in this preview. Sign in to Upvite to see the full invitation configuration.'}
+          </p>
+        </section>
+        <div className="invite-public-footer">
+          <div className="invite-public-actions">
+            <a href="/" className="btn btn-primary btn-sm">
+              Open Upvite
+            </a>
+            <a href="/builder" className="btn btn-secondary btn-sm">
+              Create your own invitation
+            </a>
+          </div>
+          <p className="invite-public-meta">
+            This invitation made with <Link to="/">Upvite</Link>.
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
 
 export default InvitePublicPage
-
