@@ -1,11 +1,26 @@
-import { useSelector } from 'react-redux'
-import { useMemo } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toPng } from 'html-to-image'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
+import {
+  fetchInvitationBatches,
+  deleteInvitationBatch,
+} from '../features/invitations/invitationsSlice'
 
 function ProfilePage() {
+  const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
   const batches = useSelector((state) => state.invitations.batches)
+  const captureRef = useRef(null)
+  const [captureConfig, setCaptureConfig] = useState(null)
+  const [openLinksBatchId, setOpenLinksBatchId] = useState(null)
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchInvitationBatches())
+    }
+  }, [user, dispatch])
 
   const hasBatches = batches && batches.length > 0
 
@@ -27,6 +42,9 @@ function ProfilePage() {
           templateLabel,
           count,
           items,
+          invitationText: invitation.text_content,
+          eventDate: invitation.event_date,
+          eventLocation: invitation.event_location,
         }
       }),
     [batches],
@@ -55,23 +73,40 @@ function ProfilePage() {
     return topLabel
   }, [mappedBatches, hasBatches])
 
-  function downloadCsv(batch) {
-    const rows = batch.items.map((item) => ({
-      first_name: item.first_name,
-      last_name: item.last_name,
-      share_url: `${window.location.origin}/invite/${batch.templateSlug}/${item.slug}`,
-    }))
-    const header = Object.keys(rows[0]).join(',')
-    const body = rows.map((row) => Object.values(row).join(',')).join('\n')
-    const blob = new Blob([`${header}\n${body}`], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `invitations-${batch.id}.csv`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+  function toggleLinks(batch) {
+    if (!batch.items || batch.items.length === 0) {
+      return
+    }
+    setOpenLinksBatchId((current) => (current === batch.id ? null : batch.id))
+  }
+
+  async function downloadDesigns(batch) {
+    if (!batch.items || batch.items.length === 0) {
+      return
+    }
+    for (const item of batch.items) {
+      setCaptureConfig({
+        templateSlug: batch.templateSlug,
+        firstName: item.first_name,
+        lastName: item.last_name,
+        text: batch.invitationText,
+        eventDate: batch.eventDate,
+        eventLocation: batch.eventLocation,
+      })
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      if (!captureRef.current) continue
+      await toPng(captureRef.current, { cacheBust: true }).then((dataUrl) => {
+        const link = document.createElement('a')
+        const safeFirst = item.first_name || 'guest'
+        const safeLast = item.last_name || ''
+        link.href = dataUrl
+        link.download = `invitation-${safeFirst}-${safeLast || 'image'}.png`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+    }
+    setCaptureConfig(null)
   }
 
   return (
@@ -119,9 +154,14 @@ function ProfilePage() {
               title={`${batch.count} invitation${batch.count === 1 ? '' : 's'}`}
               subtitle={`Template: ${batch.templateLabel}`}
               footer={
-                <Button variant="secondary" onClick={() => downloadCsv(batch)}>
-                  Download CSV with share links
-                </Button>
+                <>
+                  <Button variant="secondary" onClick={() => downloadDesigns(batch)}>
+                    Download designs as PNG
+                  </Button>
+                  <Button variant="ghost" onClick={() => toggleLinks(batch)}>
+                    Show all links
+                  </Button>
+                </>
               }
             >
               <div className="profile-batch-header">
@@ -142,11 +182,62 @@ function ProfilePage() {
                   </div>
                 </div>
                 <span className="status-badge status-badge-success">Active</span>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => dispatch(deleteInvitationBatch(batch.id))}
+                >
+                  Delete
+                </Button>
               </div>
+              {openLinksBatchId === batch.id && (
+                <div className="profile-batch-links">
+                  <p className="profile-batch-links-title">Share links</p>
+                  <ul className="profile-batch-links-list">
+                    {batch.items.map((item) => (
+                      <li key={item.id || item.slug} className="profile-batch-links-item">
+                        <span className="profile-batch-links-name">
+                          {item.first_name} {item.last_name}
+                        </span>
+                        <a
+                          href={`/invite/${batch.templateSlug}/${item.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="profile-batch-links-url"
+                        >
+                          /invite/{batch.templateSlug}/{item.slug}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </Card>
           ))}
         </div>
       )}
+      <div style={{ position: 'fixed', left: '-9999px', top: 0 }}>
+        {captureConfig && (
+          <section
+            ref={captureRef}
+            className={`invite-card invite-card-${captureConfig.templateSlug}`}
+          >
+            <p className="invite-label">Invitation</p>
+            <h1 className="invite-name">
+              {captureConfig.firstName} {captureConfig.lastName}
+            </h1>
+            <p className="invite-text">
+              {captureConfig.text ||
+                'You are invited to this event. The host used Upvite to generate personalized invitations for every guest.'}
+            </p>
+            <p className="invite-meta">
+              {(captureConfig.eventDate || 'Event date') +
+                ' • ' +
+                (captureConfig.eventLocation || 'Location')}
+            </p>
+          </section>
+        )}
+      </div>
     </div>
   )
 }

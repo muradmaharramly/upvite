@@ -53,7 +53,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-primary));
+  background: linear-gradient(135deg, var(--color-primary-transparent), var(--color-primary));
   color: var(--color-text-main);
 }
 
@@ -588,6 +588,11 @@
     transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
+[data-theme='dark'] .builder-step {
+  background-color: rgba(148, 163, 184, 0.16);
+  color: var(--color-text-main);
+}
+
 .builder-step-index {
   width: 1.4rem;
   height: 1.4rem;
@@ -601,6 +606,10 @@
   font-size: 0.75rem;
 }
 
+[data-theme='dark'] .builder-step-index {
+  background-color: rgba(148, 163, 184, 0.3);
+}
+
 .builder-step-label {
   font-weight: 500;
 }
@@ -612,9 +621,20 @@
   transform: translateY(-1px);
 }
 
+[data-theme='dark'] .builder-step.is-active {
+  background-color: rgba(129, 140, 248, 0.24);
+  color: var(--color-primary-strong);
+  box-shadow: var(--shadow-soft);
+}
+
 .builder-step.is-active .builder-step-index {
   background-color: rgba(129, 140, 248, 0.16);
   color: var(--color-primary);
+}
+
+[data-theme='dark'] .builder-step.is-active .builder-step-index {
+  background-color: var(--color-primary);
+  color: #ffffff;
 }
 
 .builder-two-column {
@@ -932,6 +952,51 @@
   margin: 0.2rem 0 0;
   font-size: 0.8rem;
   color: var(--color-text-muted);
+}
+
+.profile-batch-links {
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed rgba(148, 163, 184, 0.45);
+}
+
+.profile-batch-links-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.profile-batch-links-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profile-batch-links-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+}
+
+.profile-batch-links-name {
+  font-weight: 500;
+}
+
+.profile-batch-links-url {
+  color: var(--color-primary);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.profile-batch-links-url:hover {
+  text-decoration: underline;
 }
 
 .app-nav-icon {
