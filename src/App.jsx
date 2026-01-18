@@ -8,11 +8,13 @@ import ProfilePage from './pages/ProfilePage'
 import AuthPage from './pages/AuthPage'
 import InvitePublicPage from './pages/InvitePublicPage'
 import AuthInitializer from './features/auth/AuthInitializer'
+import ThemeInitializer from './features/ui/ThemeInitializer'
 
 function App() {
   return (
     <>
       <AuthInitializer />
+      <ThemeInitializer />
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<LandingPage />} />

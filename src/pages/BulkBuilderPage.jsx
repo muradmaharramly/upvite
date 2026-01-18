@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import Papa from 'papaparse'
@@ -8,6 +8,7 @@ import Input from '../components/ui/Input'
 import TextArea from '../components/ui/TextArea'
 import Select from '../components/ui/Select'
 import Button from '../components/ui/Button'
+import { FiUploadCloud } from 'react-icons/fi'
 import {
   clearInvitationError,
   createInvitationBatch,
@@ -24,6 +25,8 @@ const templateOptions = [
 
 function BulkBuilderPage() {
   const [fileName, setFileName] = useState('')
+  const [isDragging, setIsDragging] = useState(false)
+  const fileInputRef = useRef(null)
   const dispatch = useDispatch()
   const bulk = useSelector((state) => state.invitations.bulk)
   const templateSlug = useSelector((state) => state.invitations.templateSlug)
@@ -79,8 +82,7 @@ function BulkBuilderPage() {
     })
   }
 
-  function handleFileChange(event) {
-    const file = event.target.files?.[0]
+  function handleFile(file) {
     if (!file) return
     const extension = file.name.toLowerCase().split('.').pop()
     setFileName(file.name)
@@ -115,6 +117,36 @@ function BulkBuilderPage() {
     }
   }
 
+  function handleFileChange(event) {
+    const file = event.target.files?.[0]
+    handleFile(file)
+  }
+
+  function handleDropzoneClick() {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  function handleDrop(event) {
+    event.preventDefault()
+    setIsDragging(false)
+    const file = event.dataTransfer?.files?.[0]
+    handleFile(file)
+  }
+
+  function handleDragOver(event) {
+    event.preventDefault()
+    if (!isDragging) {
+      setIsDragging(true)
+    }
+  }
+
+  function handleDragLeave(event) {
+    event.preventDefault()
+    setIsDragging(false)
+  }
+
   async function handleSaveBatch() {
     if (!recipients.length) {
       toast.error('Import at least one recipient before saving')
@@ -146,27 +178,75 @@ function BulkBuilderPage() {
           </p>
         </div>
       </header>
+      <div className="builder-steps">
+        <div className="builder-step is-active">
+          <span className="builder-step-index">1</span>
+          <span className="builder-step-label">Upload list</span>
+        </div>
+        <div className="builder-step">
+          <span className="builder-step-index">2</span>
+          <span className="builder-step-label">Configure invitation</span>
+        </div>
+        <div className="builder-step">
+          <span className="builder-step-index">3</span>
+          <span className="builder-step-label">Preview batch</span>
+        </div>
+      </div>
       <div className="builder-two-column">
         <Card title="Upload recipients">
-          <div className="field">
-            <label htmlFor="file" className="field-label">
-              CSV or Excel file
-            </label>
+          <div
+            className={`field upload-dropzone ${isDragging ? 'is-dragging' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={handleDropzoneClick}
+          >
+            <div className="upload-dropzone-icon">
+              <FiUploadCloud />
+            </div>
+            <p className="upload-dropzone-title">
+              Drag and drop your CSV or Excel file here
+            </p>
+            <p className="upload-dropzone-subtitle">
+              or{' '}
+              <label htmlFor="file" className="upload-dropzone-link">
+                choose file
+              </label>{' '}
+              from your computer
+            </p>
             <input
               id="file"
               name="file"
               type="file"
               accept=".csv,.xlsx,.xls"
-              className="field-input"
+              className="upload-dropzone-input"
+              ref={fileInputRef}
               onChange={handleFileChange}
             />
             <p className="field-helper">
               File should contain at least two columns: first name and surname.
             </p>
             {fileName && (
-              <p className="field-helper">
-                Selected file: <strong>{fileName}</strong>
-              </p>
+              <>
+                <p className="field-helper">
+                  Selected file: <strong>{fileName}</strong>
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm upload-remove-btn"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setFileName('')
+                    dispatch(setRecipients([]))
+                    dispatch(clearInvitationError())
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = ''
+                    }
+                  }}
+                >
+                  Remove file
+                </button>
+              </>
             )}
           </div>
           <div className="empty-state">
@@ -207,13 +287,25 @@ function BulkBuilderPage() {
               onChange={handleBulkChange('eventLocation')}
             />
           </div>
-          <Select
-            name="template"
-            label="Invitation template"
-            value={templateSlug}
-            onChange={(event) => dispatch(setTemplateSlug(event.target.value))}
-            options={templateOptions}
-          />
+          <div className="field">
+            <div className="field-label">Invitation template</div>
+            <div className="template-grid">
+              {templateOptions.map((option) => {
+                const isActive = option.value === templateSlug
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`template-card${isActive ? ' is-active' : ''}`}
+                    onClick={() => dispatch(setTemplateSlug(option.value))}
+                  >
+                    <span className="template-card-label">Preset</span>
+                    <span className="template-card-name">{option.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
           {error && <p className="auth-error">{error}</p>}
           <div className="builder-actions">
             <Button variant="secondary" onClick={handleSaveBatch} isLoading={isSaving}>
@@ -251,4 +343,3 @@ function BulkBuilderPage() {
 }
 
 export default BulkBuilderPage
-

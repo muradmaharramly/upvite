@@ -56,7 +56,7 @@ function AuthPage() {
           user
             ? 'You are signed in'
             : mode === 'signin'
-            ? 'Sign in to download and share invitations'
+            ? 'Sign in to download/share invitations'
             : 'Create an account to save invitations'
         }
         subtitle="Guests can upload and preview without an account"

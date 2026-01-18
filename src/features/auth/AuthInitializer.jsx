@@ -1,29 +1,27 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { getSupabaseClient } from '../../lib/supabaseClient'
-import { fetchCurrentUser, setUser } from './authSlice'
+import { setUser } from './authSlice'
 
 function AuthInitializer() {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(fetchCurrentUser())
-    const supabase = getSupabaseClient()
-    if (!supabase) {
-      return
+    try {
+      const stored = window.localStorage.getItem('upvite_user')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (parsed && parsed.email) {
+          dispatch(setUser(parsed))
+          return
+        }
+      }
+    } catch {
+      window.localStorage.removeItem('upvite_user')
     }
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      dispatch(setUser(session?.user || null))
-    })
-    return () => {
-      subscription.unsubscribe()
-    }
+    dispatch(setUser(null))
   }, [dispatch])
 
   return null
 }
 
 export default AuthInitializer
-

@@ -32,7 +32,7 @@ function LandingPage() {
           </p>
         </div>
         <div className="landing-hero-preview">
-          <Card
+          <Card className="preview-card"
             title="Bulk upload preview"
             subtitle="Generate a full invitation batch from a spreadsheet"
           >
@@ -55,6 +55,28 @@ function LandingPage() {
               </div>
             </div>
           </Card>
+          <Card className="preview-card"
+            title="Manual invitation preview"
+            subtitle="Create a single personalized invite in just a few fields"
+          >
+            <div className="landing-hero-preview-body">
+              <div className="landing-pill">VIP guest mode</div>
+              <div className="landing-preview-templates">
+                <span>Guest</span>
+                <div className="landing-template-badges">
+                  <span>Ali</span>
+                  <span>Aliyev</span>
+                </div>
+              </div>
+              <div className="landing-preview-footer">
+                <div>
+                  <p className="landing-preview-title">Personal dinner invitation</p>
+                  <p className="landing-preview-meta">Tonight • Baku</p>
+                </div>
+                <span className="landing-preview-status">Ready to share</span>
+              </div>
+            </div>
+          </Card>
         </div>
       </section>
     </div>
@@ -62,4 +84,3 @@ function LandingPage() {
 }
 
 export default LandingPage
-

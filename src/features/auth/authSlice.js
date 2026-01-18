@@ -8,21 +8,6 @@ const initialState = {
   initialized: false,
 }
 
-export const fetchCurrentUser = createAsyncThunk('auth/fetchCurrentUser', async () => {
-  const supabase = getSupabaseClient()
-  if (!supabase) {
-    return { user: null }
-  }
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser()
-  if (error) {
-    return { user: null }
-  }
-  return { user }
-})
-
 export const signInWithEmail = createAsyncThunk(
   'auth/signInWithEmail',
   async ({ email, password }, { rejectWithValue }) => {
@@ -30,13 +15,18 @@ export const signInWithEmail = createAsyncThunk(
     if (!supabase) {
       return rejectWithValue('Supabase is not configured')
     }
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.rpc('sign_in_profile', {
+      p_email: email,
+      p_password: password,
+    })
     if (error) {
       return rejectWithValue(error.message)
     }
+    if (!data) {
+      return rejectWithValue('Invalid email or password')
+    }
+    const user = { id: data.id, email: data.email }
+    window.localStorage.setItem('upvite_user', JSON.stringify(user))
     return { user }
   },
 )
@@ -48,26 +38,22 @@ export const signUpWithEmail = createAsyncThunk(
     if (!supabase) {
       return rejectWithValue('Supabase is not configured')
     }
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.signUp({ email, password })
+    const { data, error } = await supabase.rpc('sign_up_profile', {
+      p_email: email,
+      p_password: password,
+    })
     if (error) {
       return rejectWithValue(error.message)
     }
+    const user = { id: data.id, email: data.email }
+    window.localStorage.setItem('upvite_user', JSON.stringify(user))
     return { user }
   },
 )
 
-export const signOut = createAsyncThunk('auth/signOut', async (_, { rejectWithValue }) => {
-  const supabase = getSupabaseClient()
-  if (!supabase) {
-    return
-  }
-  const { error } = await supabase.auth.signOut()
-  if (error) {
-    return rejectWithValue(error.message)
-  }
+export const signOut = createAsyncThunk('auth/signOut', async () => {
+  window.localStorage.removeItem('upvite_user')
+  return
 })
 
 const authSlice = createSlice({
@@ -85,19 +71,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCurrentUser.pending, (state) => {
-        state.status = 'loading'
-      })
-      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
-        state.status = 'succeeded'
-        state.user = action.payload.user
-        state.initialized = true
-      })
-      .addCase(fetchCurrentUser.rejected, (state) => {
-        state.status = 'failed'
-        state.user = null
-        state.initialized = true
-      })
       .addCase(signInWithEmail.pending, (state) => {
         state.status = 'loading'
         state.error = null
@@ -114,9 +87,8 @@ const authSlice = createSlice({
         state.status = 'loading'
         state.error = null
       })
-      .addCase(signUpWithEmail.fulfilled, (state, action) => {
+      .addCase(signUpWithEmail.fulfilled, (state) => {
         state.status = 'succeeded'
-        state.user = action.payload.user
       })
       .addCase(signUpWithEmail.rejected, (state, action) => {
         state.status = 'failed'
@@ -140,4 +112,3 @@ const authSlice = createSlice({
 export const { setUser, clearAuthError } = authSlice.actions
 
 export default authSlice.reducer
-

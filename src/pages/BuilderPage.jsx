@@ -13,10 +13,24 @@ function BuilderPage() {
             for every recipient.
           </p>
         </div>
-        <Link to="/profile" className="btn btn-ghost">
+        <Link to="/profile" className="btn btn-primary">
           View my invitations
         </Link>
       </header>
+      <div className="builder-steps">
+        <div className="builder-step is-active">
+          <span className="builder-step-index">1</span>
+          <span className="builder-step-label">Choose creation mode</span>
+        </div>
+        <div className="builder-step">
+          <span className="builder-step-index">2</span>
+          <span className="builder-step-label">Configure invitation</span>
+        </div>
+        <div className="builder-step">
+          <span className="builder-step-index">3</span>
+          <span className="builder-step-label">Preview &amp; share</span>
+        </div>
+      </div>
       <div className="builder-grid">
         <Card
           title="Manual mode"
@@ -52,4 +66,3 @@ function BuilderPage() {
 }
 
 export default BuilderPage
-

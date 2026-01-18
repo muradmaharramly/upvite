@@ -53,6 +53,20 @@ function ManualBuilderPage() {
           </p>
         </div>
       </header>
+      <div className="builder-steps">
+        <div className="builder-step is-active">
+          <span className="builder-step-index">1</span>
+          <span className="builder-step-label">Recipient</span>
+        </div>
+        <div className="builder-step">
+          <span className="builder-step-index">2</span>
+          <span className="builder-step-label">Message &amp; event</span>
+        </div>
+        <div className="builder-step">
+          <span className="builder-step-index">3</span>
+          <span className="builder-step-label">Template &amp; link</span>
+        </div>
+      </div>
       <div className="builder-two-column">
         <Card title="Invitation details">
           <div className="form-grid">
@@ -95,13 +109,25 @@ function ManualBuilderPage() {
               onChange={handleChange('eventLocation')}
             />
           </div>
-          <Select
-            name="template"
-            label="Invitation template"
-            value={templateSlug}
-            onChange={(event) => dispatch(setTemplateSlug(event.target.value))}
-            options={templateOptions}
-          />
+          <div className="field">
+            <div className="field-label">Invitation template</div>
+            <div className="template-grid">
+              {templateOptions.map((option) => {
+                const isActive = option.value === templateSlug
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`template-card${isActive ? ' is-active' : ''}`}
+                    onClick={() => dispatch(setTemplateSlug(option.value))}
+                  >
+                    <span className="template-card-label">Preset</span>
+                    <span className="template-card-name">{option.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
           <div className="builder-actions">
             <Button variant="secondary" onClick={handleCopyLink}>
               Copy share link
@@ -141,4 +167,3 @@ function ManualBuilderPage() {
 }
 
 export default ManualBuilderPage
-

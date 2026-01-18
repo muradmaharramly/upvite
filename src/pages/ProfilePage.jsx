@@ -32,6 +32,29 @@ function ProfilePage() {
     [batches],
   )
 
+  const totalInvitations = useMemo(
+    () => (hasBatches ? batches.reduce((sum, batch) => sum + batch.items.length, 0) : 0),
+    [batches, hasBatches],
+  )
+
+  const mostUsedTemplateLabel = useMemo(() => {
+    if (!hasBatches) return 'None yet'
+    const counts = new Map()
+    mappedBatches.forEach((batch) => {
+      const current = counts.get(batch.templateLabel) || 0
+      counts.set(batch.templateLabel, current + batch.count)
+    })
+    let topLabel = 'Unknown'
+    let topCount = 0
+    counts.forEach((count, label) => {
+      if (count > topCount) {
+        topCount = count
+        topLabel = label
+      }
+    })
+    return topLabel
+  }, [mappedBatches, hasBatches])
+
   function downloadCsv(batch) {
     const rows = batch.items.map((item) => ({
       first_name: item.first_name,
@@ -63,9 +86,23 @@ function ProfilePage() {
           </p>
         </div>
       </header>
+      <section className="profile-overview-grid">
+        <Card title="Total invitations">
+          <p className="profile-overview-value">{totalInvitations}</p>
+        </Card>
+        <Card title="Saved batches">
+          <p className="profile-overview-value">{hasBatches ? batches.length : 0}</p>
+        </Card>
+        <Card title="Most used template">
+          <p className="profile-overview-value">{mostUsedTemplateLabel}</p>
+        </Card>
+      </section>
       {!hasBatches && (
         <Card title="No invitations yet" subtitle="Your invitation history is empty">
-          <div className="empty-state">
+          <div className="empty-state profile-empty-state">
+            <div className="profile-empty-illustration" aria-hidden="true">
+              <span className="profile-empty-glass" />
+            </div>
             <p className="empty-state-title">You have not created any invitations yet</p>
             <p className="empty-state-text">
               Use manual or bulk mode to generate invitations. When you save a batch while
@@ -87,10 +124,25 @@ function ProfilePage() {
                 </Button>
               }
             >
-              <p className="profile-batch-meta">
-                Share URLs are generated using the pattern /invite/{batch.templateSlug}/
-                first-last
-              </p>
+              <div className="profile-batch-header">
+                <div className="profile-batch-header-main">
+                  <div className="profile-batch-avatar">
+                    {batch.templateLabel ? batch.templateLabel.charAt(0) : 'I'}
+                  </div>
+                  <div>
+                    <p className="profile-batch-meta">
+                      Share URLs use /invite/{batch.templateSlug}/first-last
+                    </p>
+                    <p className="profile-batch-date">
+                      Created on{' '}
+                      {batch.createdAt
+                        ? new Date(batch.createdAt).toLocaleDateString()
+                        : 'unknown date'}
+                    </p>
+                  </div>
+                </div>
+                <span className="status-badge status-badge-success">Active</span>
+              </div>
             </Card>
           ))}
         </div>
