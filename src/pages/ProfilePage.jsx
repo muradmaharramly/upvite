@@ -7,6 +7,7 @@ import {
   fetchInvitationBatches,
   deleteInvitationBatch,
 } from '../features/invitations/invitationsSlice'
+import { FiTrash } from 'react-icons/fi'
 
 function ProfilePage() {
   const dispatch = useDispatch()
@@ -33,8 +34,8 @@ function ProfilePage() {
           invitation.template_slug === 'minimal'
             ? 'Minimal'
             : invitation.template_slug === 'bold'
-            ? 'Bold'
-            : 'Classic'
+              ? 'Bold'
+              : 'Classic'
         return {
           id: invitation.id,
           createdAt: invitation.created_at,
@@ -109,6 +110,15 @@ function ProfilePage() {
     setCaptureConfig(null)
   }
 
+  function getBatchLink(batch, item) {
+    const params = new URLSearchParams()
+    if (batch.invitationText) params.set('text', batch.invitationText)
+    if (batch.eventDate) params.set('date', batch.eventDate)
+    if (batch.eventLocation) params.set('location', batch.eventLocation)
+    const qs = params.toString()
+    return `/invite/${batch.templateSlug}/${item.slug}${qs ? `?${qs}` : ''}`
+  }
+
   return (
     <div className="profile-page">
       <header className="page-header">
@@ -150,6 +160,7 @@ function ProfilePage() {
         <div className="profile-batch-grid">
           {mappedBatches.map((batch) => (
             <Card
+              className="profile-batch-card"
               key={batch.id}
               title={`${batch.count} invitation${batch.count === 1 ? '' : 's'}`}
               subtitle={`Template: ${batch.templateLabel}`}
@@ -165,7 +176,16 @@ function ProfilePage() {
               }
             >
               <div className="profile-batch-header">
+                <Button
+                  className="btn delete-btn btn-danger"
+                  variant="danger"
+                  size="sm"
+                  onClick={() => dispatch(deleteInvitationBatch(batch.id))}
+                >
+                  <FiTrash />
+                </Button>
                 <div className="profile-batch-header-main">
+
                   <div className="profile-batch-avatar">
                     {batch.templateLabel ? batch.templateLabel.charAt(0) : 'I'}
                   </div>
@@ -182,13 +202,6 @@ function ProfilePage() {
                   </div>
                 </div>
                 <span className="status-badge status-badge-success">Active</span>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => dispatch(deleteInvitationBatch(batch.id))}
-                >
-                  Delete
-                </Button>
               </div>
               {openLinksBatchId === batch.id && (
                 <div className="profile-batch-links">
@@ -200,7 +213,7 @@ function ProfilePage() {
                           {item.first_name} {item.last_name}
                         </span>
                         <a
-                          href={`/invite/${batch.templateSlug}/${item.slug}`}
+                          href={getBatchLink(batch, item)}
                           target="_blank"
                           rel="noreferrer"
                           className="profile-batch-links-url"

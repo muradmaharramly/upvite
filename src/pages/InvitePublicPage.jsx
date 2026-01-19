@@ -1,4 +1,5 @@
 import { useParams, useLocation, Link } from 'react-router-dom'
+import AppLogoTransparent from '../assets/images/upvite-logo-transparent.png'
 
 function formatNameFromSlug(slug) {
   if (!slug) return ''
@@ -24,6 +25,7 @@ function InvitePublicPage() {
     <div className="invite-public-page">
       <div className="invite-public-inner">
         <section className={`invite-card invite-card-${templateSlug}`}>
+        <div className='img-div'><img src={AppLogoTransparent} /></div>
           <p className="invite-label">Invitation</p>
           <h1 className="invite-name">{fullName || 'Your guest'}</h1>
           <p className="invite-text">

@@ -25,7 +25,7 @@ const initialState = {
 
 export const createInvitationBatch = createAsyncThunk(
   'invitations/createInvitationBatch',
-  async ({ recipients, templateSlug }, { getState, rejectWithValue }) => {
+  async ({ recipients, templateSlug, invitationData }, { getState, rejectWithValue }) => {
     const supabase = getSupabaseClient()
     if (!supabase) {
       return rejectWithValue('Supabase is not configured')
@@ -35,7 +35,7 @@ export const createInvitationBatch = createAsyncThunk(
     if (!user) {
       return rejectWithValue('You need to be signed in to save invitations')
     }
-    const { text, eventDate, eventLocation } = state.invitations.bulk
+    const { text, eventDate, eventLocation } = invitationData || state.invitations.bulk
     const { data: invitation, error: invitationError } = await supabase
       .from('invitations')
       .insert({

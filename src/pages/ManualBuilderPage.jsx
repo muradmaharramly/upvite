@@ -6,7 +6,7 @@ import TextArea from '../components/ui/TextArea'
 import Select from '../components/ui/Select'
 import Button from '../components/ui/Button'
 import { createSlugForName } from '../utils/slug'
-import { setTemplateSlug, updateManualField } from '../features/invitations/invitationsSlice'
+import { setTemplateSlug, updateManualField, createInvitationBatch } from '../features/invitations/invitationsSlice'
 
 const templateOptions = [
   { value: 'classic', label: 'Classic' },
@@ -18,6 +18,7 @@ function ManualBuilderPage() {
   const dispatch = useDispatch()
   const manual = useSelector((state) => state.invitations.manual)
   const templateSlug = useSelector((state) => state.invitations.templateSlug)
+  const user = useSelector((state) => state.auth.user)
 
   const slug = createSlugForName(manual.firstName, manual.lastName)
 
@@ -46,6 +47,29 @@ function ManualBuilderPage() {
       toast.success('Share link copied')
     } else {
       toast.info(url)
+    }
+  }
+
+  async function handleSave() {
+    if (!manual.firstName && !manual.lastName) {
+      toast.error('Enter a name and surname first')
+      return
+    }
+    const result = await dispatch(
+      createInvitationBatch({
+        recipients: [{ firstName: manual.firstName, lastName: manual.lastName }],
+        templateSlug: templateSlug,
+        invitationData: {
+          text: manual.text,
+          eventDate: manual.eventDate,
+          eventLocation: manual.eventLocation,
+        },
+      }),
+    )
+    if (createInvitationBatch.fulfilled.match(result)) {
+      toast.success('Invitation saved to profile')
+    } else if (result.payload) {
+      toast.error(result.payload)
     }
   }
 
@@ -139,6 +163,11 @@ function ManualBuilderPage() {
             <Button variant="secondary" onClick={handleCopyLink}>
               Copy share link
             </Button>
+            {user && (
+              <Button onClick={handleSave} style={{ marginLeft: '0.5rem' }}>
+                Save to profile
+              </Button>
+            )}
           </div>
         </Card>
         <Card title="Live preview">

@@ -58,7 +58,7 @@
 }
 
 .btn-secondary {
-  background-color: var(--color-surface);
+  background: linear-gradient(135deg, var(--color-primary-soft-transparent), var(--color-primary-transparent));
   color: var(--color-text-main);
   border: 1px solid rgba(148, 163, 184, 0.35);
 }
@@ -338,6 +338,11 @@
   gap: 2.5rem;
   padding-top: 20px;
 }
+@media (max-width: 768px) {
+  .landing{
+    padding-top: 50px;
+  }
+}
 
 .landing-hero {
   display: grid;
@@ -473,6 +478,11 @@
   flex-direction: column;
   gap: 1.25rem;
 }
+@media (max-width: 768px) {
+  .builder-page{
+    padding-top: 50px;
+  }
+}
 
 .builder-grid {
   display: grid;
@@ -568,6 +578,11 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+@media (max-width: 768px) {
+  .profile-page{
+    padding-top: 50px;
+  }
 }
 
 .builder-steps {
@@ -794,10 +809,32 @@
   box-shadow: var(--shadow-soft);
 }
 
+[data-theme='dark'] .template-card:hover {
+  border-color: rgba(129, 140, 248, 0.24);
+  background-color: rgba(129, 140, 248, 0.24);
+}
+
+[data-theme='dark'] .template-card.is-active {
+  background-color: rgba(129, 140, 248, 0.24);
+  color: var(--color-primary);
+}
+
+[data-theme='dark'] .template-card.is-active .template-card-label {
+  color: rgba(129, 140, 248, 0.8);
+}
+
 .profile-batch-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
+}
+.profile-batch-header{
+  position: relative;
+  .delete-btn{
+    position: absolute;
+    top: -70px;
+    right: 0;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1253,6 +1290,20 @@
     radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.22), #020617);
   color: #f9fafb;
   box-shadow: var(--shadow-soft);
+  position: relative;
+  .img-div{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    overflow: hidden;
+}
 }
 
 .invite-card-classic {
@@ -1262,7 +1313,7 @@
 
 .invite-card-minimal {
   background: linear-gradient(135deg, #f9fafb, #e5e7eb);
-  color: var(--color-text-main);
+  color: #111827;
 }
 
 .invite-card-bold {
