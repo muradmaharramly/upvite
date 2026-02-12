@@ -2,7 +2,6 @@ const { createClient } = require('@supabase/supabase-js');
 
 /**
  * Netlify Scheduled Function to keep Supabase project active.
- * This runs every 6 hours as configured in netlify.toml.
  */
 const handler = async (event, context) => {
   console.log('Keep-alive function triggered at:', new Date().toISOString());
@@ -24,7 +23,6 @@ const handler = async (event, context) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Perform a lightweight request to create activity
-    // We select 1 from a standard table or just a simple query
     const { data, error } = await supabase
       .from('invitations')
       .select('id')
@@ -52,6 +50,13 @@ const handler = async (event, context) => {
       }),
     };
   }
+};
+
+// This is the property you were looking for! 
+// In modern Netlify functions, you can export a config object directly in the file.
+// This is an alternative to defining the schedule in netlify.toml.
+export const config = {
+  schedule: "0 */6 * * *"
 };
 
 module.exports = { handler };

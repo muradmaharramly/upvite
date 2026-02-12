@@ -9,5 +9,5 @@
   status = 200
 
 [functions."supabase-keep-alive"]
-  schedule = "0 */6 * * *"
+  # Schedule is now managed inside the function file via config export
 
