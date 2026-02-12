@@ -56,7 +56,9 @@ const handler = async (event, context) => {
 // In modern Netlify functions, you can export a config object directly in the file.
 // This is an alternative to defining the schedule in netlify.toml.
 export const config = {
-  schedule: "0 */6 * * *"
+  // Every day at 01:00 AM Azerbaijan time (UTC+4)
+  schedule: "0 21 * * *"
 };
+
 
 module.exports = { handler };
